@@ -13,6 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import "@/app/globals.css"
+import { DayPilot, DayPilotCalendar } from "@daypilot/daypilot-lite-react";
 
 const appointments = [
     { id: 1, customer: "John Doe", service: "AC Repair", date: "2024-08-01", time: "10:00 AM", technician: "Alice Smith", status: "Scheduled" },
@@ -45,6 +46,41 @@ const Dashboard = () => {
     const [chatOptions, setChatOptions] = useState<string[]>([
         "Book an appointment", "Check appointment status", "Get a quote", "Emergency service"
     ]);
+    const [calendar, setCalendar] = useState<DayPilot.Calendar>();
+
+    const initialConfig: DayPilot.CalendarConfig = {
+        viewType: "Week",
+        durationBarVisible: false,
+    };
+
+    const [config, setConfig] = useState(initialConfig);
+
+    useEffect(() => {
+        if (!calendar || calendar?.disposed()) {
+            return;
+        }
+        const events: DayPilot.EventData[] = [
+            {
+                id: 1,
+                text: "HVAC Maintenance",
+                start: "2024-10-02T10:30:00",
+                end: "2024-10-02T13:00:00",
+                tags: {
+                    participants: 2,
+                }
+            },
+            // ... (add more events as needed)
+        ];
+
+        const startDate = "2024-10-01";
+
+        calendar.update({startDate, events});
+    }, [calendar]);
+
+    const handleDateSelect = (args: DayPilot.CalendarTimeRangeSelectedArgs) => {
+        const selectedDate = args.start.value.substr(0, 10);
+        handleSendMessage(`I'd like to book an appointment on ${selectedDate}`);
+    };
 
     const handleSendMessage = (message: string = inputMessage) => {
         if (message.trim()) {
@@ -57,11 +93,13 @@ const Dashboard = () => {
 
                 switch (message.toLowerCase()) {
                     case "book an appointment":
-                        botResponse = "Certainly, I can help you book an appointment. What type of service are you looking for?";
-                        newOptions = ["AC repair", "Heating maintenance", "Duct cleaning"];
+                        botResponse = "Certainly! I can help you book an appointment. Please select a date from the calendar below, and then I'll show you available time slots.";
+                        newOptions = [];
                         break;
                     case "ac repair":
-                        botResponse = "I understand you need AC repair. When would you like to schedule the appointment?";
+                    case "heating maintenance":
+                    case "duct cleaning":
+                        botResponse = `I understand you need ${message}. When would you like to schedule the appointment?`;
                         newOptions = ["Tomorrow", "This week", "Next week"];
                         break;
                     case "check appointment status":
@@ -211,7 +249,7 @@ const Dashboard = () => {
                                                 <Progress value={parseInt(technician.utilization)} className="w-[60%]" />
                                             </TableCell>
                                             <TableCell>
-                                                <Badge variant={technician.availability === "Available" ? "success" : "secondary"}>
+                                                <Badge variant={technician.availability === "Available" ? "default" : "secondary"}>
                                                     {technician.availability}
                                                 </Badge>
                                             </TableCell>
@@ -229,26 +267,37 @@ const Dashboard = () => {
                             <CardTitle>Chat with HVAC Assistant</CardTitle>
                         </CardHeader>
                         <CardContent>
-                            <ScrollArea className="h-[400px] pr-4 mb-4">
-                                {messages.map((msg, index) => (
-                                    <ChatMessage key={index} message={msg.text} isUser={msg.isUser} />
-                                ))}
-                            </ScrollArea>
-                            <div className="flex flex-wrap gap-2 mb-4">
-                                {chatOptions.map((option, index) => (
-                                    <Button key={index} variant="outline" onClick={() => handleSendMessage(option)}>
-                                        {option}
-                                    </Button>
-                                ))}
-                            </div>
                             <div className="flex">
-                                <Input
-                                    value={inputMessage}
-                                    onChange={(e) => setInputMessage(e.target.value)}
-                                    placeholder="Type your message..."
-                                    onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-                                />
-                                <Button onClick={() => handleSendMessage()} className="ml-2">Send</Button>
+                                <div className="w-1/2 pr-4">
+                                    <ScrollArea className="h-[400px] pr-4 mb-4">
+                                        {messages.map((msg, index) => (
+                                            <ChatMessage key={index} message={msg.text} isUser={msg.isUser} />
+                                        ))}
+                                    </ScrollArea>
+                                    <div className="flex flex-wrap gap-2 mb-4">
+                                        {chatOptions.map((option, index) => (
+                                            <Button key={index} variant="outline" onClick={() => handleSendMessage(option)}>
+                                                {option}
+                                            </Button>
+                                        ))}
+                                    </div>
+                                    <div className="flex">
+                                        <Input
+                                            value={inputMessage}
+                                            onChange={(e) => setInputMessage(e.target.value)}
+                                            placeholder="Type your message..."
+                                            onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+                                        />
+                                        <Button onClick={() => handleSendMessage()} className="ml-2">Send</Button>
+                                    </div>
+                                </div>
+                                <div className="w-1/2 pl-4">
+                                    <DayPilotCalendar
+                                        {...config}
+                                        onTimeRangeSelected={handleDateSelect}
+                                        controlRef={setCalendar}
+                                    />
+                                </div>
                             </div>
                         </CardContent>
                     </Card>
