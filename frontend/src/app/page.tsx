@@ -118,7 +118,7 @@ const Dashboard = () => {
                         newOptions = ["No heat", "No cooling", "Strange noises", "Water leakage"];
                         break;
                     default:
-                        botResponse = "I apologize, I didn't quite understand. Could you please choose one of these options or rephrase your request?";
+                        botResponse = "I apologize, but as this is a proof of concept for the UI, my knowledge is limited. In a full implementation, I would be able to assist you with a wider range of queries. For now, could you please choose one of these options or rephrase your request?";
                         newOptions = ["Book an appointment", "Check appointment status", "Get a quote", "Emergency service"];
                 }
 
