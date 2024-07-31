@@ -14,6 +14,10 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { ScrollArea } from "@/components/ui/scroll-area";
 import "@/app/globals.css"
 import { DayPilot, DayPilotCalendar } from "@daypilot/daypilot-lite-react";
+import { FaCalendarAlt, FaUserTie, FaChartLine, FaRobot } from 'react-icons/fa';
+import { BsCalendarCheck, BsPersonLinesFill } from 'react-icons/bs';
+import { MdEngineering } from 'react-icons/md';
+import { IoMdSend } from 'react-icons/io';
 
 const appointments = [
     { id: 1, customer: "John Doe", service: "AC Repair", date: "2024-08-01", time: "10:00 AM", technician: "Alice Smith", status: "Scheduled" },
@@ -78,7 +82,7 @@ const Dashboard = () => {
     }, [calendar]);
 
     const handleDateSelect = (args: DayPilot.CalendarTimeRangeSelectedArgs) => {
-        const selectedDate = args.start.value.substr(0, 10);
+        const selectedDate = args.start.toString().slice(0, 10);
         handleSendMessage(`I'd like to book an appointment on ${selectedDate}`);
     };
 
@@ -138,17 +142,17 @@ const Dashboard = () => {
 
             <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-6">
                 <TabsList className="mb-4">
-                    <TabsTrigger value="overview">Overview</TabsTrigger>
-                    <TabsTrigger value="appointments">Appointments</TabsTrigger>
-                    <TabsTrigger value="technicians">Technicians</TabsTrigger>
-                    <TabsTrigger value="chatbot">Chatbot</TabsTrigger>
+                    <TabsTrigger value="overview"><FaChartLine className="mr-2 inline" /> Overview</TabsTrigger>
+                    <TabsTrigger value="appointments"><FaCalendarAlt className="mr-2 inline" /> Appointments</TabsTrigger>
+                    <TabsTrigger value="technicians"><FaUserTie className="mr-2 inline" /> Technicians</TabsTrigger>
+                    <TabsTrigger value="chatbot"><FaRobot className="mr-2 inline" /> Chatbot</TabsTrigger>
                 </TabsList>
                 
                 <TabsContent value="overview">
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                         <Card>
                             <CardHeader>
-                                <CardTitle>Total Appointments</CardTitle>
+                                <CardTitle><BsCalendarCheck className="mr-2 inline" /> Total Appointments</CardTitle>
                             </CardHeader>
                             <CardContent>
                                 <p className="text-3xl font-bold">{appointments.length}</p>
@@ -156,7 +160,7 @@ const Dashboard = () => {
                         </Card>
                         <Card>
                             <CardHeader>
-                                <CardTitle>Active Technicians</CardTitle>
+                                <CardTitle><BsPersonLinesFill className="mr-2 inline" /> Active Technicians</CardTitle>
                             </CardHeader>
                             <CardContent>
                                 <p className="text-3xl font-bold">{technicians.length}</p>
@@ -164,7 +168,7 @@ const Dashboard = () => {
                         </Card>
                         <Card>
                             <CardHeader>
-                                <CardTitle>Overall Utilization</CardTitle>
+                                <CardTitle><FaChartLine className="mr-2 inline" /> Overall Utilization</CardTitle>
                             </CardHeader>
                             <CardContent>
                                 <p className="text-3xl font-bold">83%</p>
@@ -210,7 +214,7 @@ const Dashboard = () => {
                                                 <TableCell>{appointment.service}</TableCell>
                                                 <TableCell>{`${appointment.date} ${appointment.time}`}</TableCell>
                                                 <TableCell>
-                                                    <Badge variant={appointment.status === "Completed" ? "secondary" : "outline"}>
+                                                    <Badge variant={appointment.status === "Completed" ? "default" : "secondary"}>
                                                         {appointment.status}
                                                     </Badge>
                                                 </TableCell>
@@ -226,7 +230,7 @@ const Dashboard = () => {
                 <TabsContent value="technicians">
                     <Card>
                         <CardHeader>
-                            <CardTitle>Technician Performance</CardTitle>
+                            <CardTitle><MdEngineering className="mr-2 inline" /> Technician Performance</CardTitle>
                         </CardHeader>
                         <CardContent>
                             <Table>
@@ -288,15 +292,28 @@ const Dashboard = () => {
                                             placeholder="Type your message..."
                                             onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
                                         />
-                                        <Button onClick={() => handleSendMessage()} className="ml-2">Send</Button>
+                                        <Button onClick={() => handleSendMessage()} className="ml-2">
+                                            <IoMdSend className="mr-2" /> Send
+                                        </Button>
                                     </div>
                                 </div>
                                 <div className="w-1/2 pl-4">
-                                    <DayPilotCalendar
-                                        {...config}
-                                        onTimeRangeSelected={handleDateSelect}
-                                        controlRef={setCalendar}
-                                    />
+                                    <Dialog>
+                                        <DialogTrigger asChild>
+                                            <Button variant="outline">Schedule Appointment</Button>
+                                        </DialogTrigger>
+                                        <DialogContent className="max-w-[800px] w-[90vw]">
+                                            <DialogHeader>
+                                                <DialogTitle>Schedule Your HVAC Appointment</DialogTitle>
+                                            </DialogHeader>
+                                            <p>Choose a date and time for your HVAC service:</p>
+                                            <DayPilotCalendar
+                                                {...config}
+                                                onTimeRangeSelected={handleDateSelect}
+                                                controlRef={setCalendar}
+                                            />
+                                        </DialogContent>
+                                    </Dialog>
                                 </div>
                             </div>
                         </CardContent>
