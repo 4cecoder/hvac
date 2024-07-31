@@ -137,7 +137,7 @@ const Dashboard = () => {
     }, [activeTab]);
 
     return (
-        <div className="p-4 max-w-7xl mx-auto">
+        <div className="container mx-auto p-4">
             <h1 className="text-3xl font-bold mb-6">HVAC Scheduling System</h1>
 
             <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-6">
@@ -271,8 +271,8 @@ const Dashboard = () => {
                             <CardTitle>Chat with HVAC Assistant</CardTitle>
                         </CardHeader>
                         <CardContent>
-                            <div className="flex">
-                                <div className="w-1/2 pr-4">
+                            <div className="flex flex-col md:flex-row">
+                                <div className="w-full md:w-1/2 md:pr-4 mb-4 md:mb-0">
                                     <ScrollArea className="h-[400px] pr-4 mb-4">
                                         {messages.map((msg, index) => (
                                             <ChatMessage key={index} message={msg.text} isUser={msg.isUser} />
@@ -280,7 +280,7 @@ const Dashboard = () => {
                                     </ScrollArea>
                                     <div className="flex flex-wrap gap-2 mb-4">
                                         {chatOptions.map((option, index) => (
-                                            <Button key={index} variant="outline" onClick={() => handleSendMessage(option)}>
+                                            <Button key={index} variant="outline" onClick={() => handleSendMessage(option)} className="text-xs md:text-sm">
                                                 {option}
                                             </Button>
                                         ))}
@@ -291,18 +291,19 @@ const Dashboard = () => {
                                             onChange={(e) => setInputMessage(e.target.value)}
                                             placeholder="Type your message..."
                                             onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+                                            className="flex-grow"
                                         />
-                                        <Button onClick={() => handleSendMessage()} className="ml-2">
-                                            <IoMdSend className="mr-2" /> Send
+                                        <Button onClick={() => handleSendMessage()} className="ml-2 whitespace-nowrap">
+                                            <IoMdSend className="mr-2 hidden md:inline" /> Send
                                         </Button>
                                     </div>
                                 </div>
-                                <div className="w-1/2 pl-4">
+                                <div className="w-full md:w-1/2 md:pl-4 mt-4 md:mt-0">
                                     <Dialog>
                                         <DialogTrigger asChild>
-                                            <Button variant="outline">Schedule Appointment</Button>
+                                            <Button variant="outline" className="w-full md:w-auto">Schedule Appointment</Button>
                                         </DialogTrigger>
-                                        <DialogContent className="max-w-[800px] w-[90vw]">
+                                        <DialogContent className="max-w-[90vw] md:max-w-[800px] w-full">
                                             <DialogHeader>
                                                 <DialogTitle>Schedule Your HVAC Appointment</DialogTitle>
                                             </DialogHeader>
