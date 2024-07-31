@@ -1,6 +1,6 @@
-"use client"
+'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
@@ -9,7 +9,6 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 // import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -37,13 +36,15 @@ const ChatMessage = ({ message, isUser }: { message: string, isUser: boolean }) 
 
 const Dashboard = () => {
     const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
-
     const [isOpen, setIsOpen] = useState(false);
+    const [activeTab, setActiveTab] = useState("overview");
     const [messages, setMessages] = useState<{ text: string, isUser: boolean }[]>([
-        { text: "Hey there, hot stuff! 🔥 Welcome to our HVAC wonderland! I'm your personal appointment fairy. What can I do for you today?", isUser: false }
+        { text: "Welcome to our HVAC Assistant. How can I help you today?", isUser: false }
     ]);
     const [inputMessage, setInputMessage] = useState('');
-    const [chatOptions, setChatOptions] = useState<string[]>([]);
+    const [chatOptions, setChatOptions] = useState<string[]>([
+        "Book an appointment", "Check appointment status", "Get a quote", "Emergency service"
+    ]);
 
     const handleSendMessage = (message: string = inputMessage) => {
         if (message.trim()) {
@@ -85,11 +86,19 @@ const Dashboard = () => {
         }
     };
 
+    useEffect(() => {
+        if (activeTab === "chatbot") {
+            setIsOpen(true);
+        } else {
+            setIsOpen(false);
+        }
+    }, [activeTab]);
+
     return (
         <div className="p-4 max-w-7xl mx-auto">
             <h1 className="text-3xl font-bold mb-6">HVAC Scheduling System</h1>
 
-            <Tabs defaultValue="overview" className="mb-6">
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-6">
                 <TabsList className="mb-4">
                     <TabsTrigger value="overview">Overview</TabsTrigger>
                     <TabsTrigger value="appointments">Appointments</TabsTrigger>
@@ -215,27 +224,24 @@ const Dashboard = () => {
                 </TabsContent>
 
                 <TabsContent value="chatbot">
-                    <Dialog open={isOpen} onOpenChange={setIsOpen}>
-                        <DialogTrigger asChild>
-                            <Button className="fixed bottom-4 right-4 rounded-full w-16 h-16">Chat</Button>
-                        </DialogTrigger>
-                        <DialogContent className="sm:max-w-[425px]">
-                            <DialogHeader>
-                                <DialogTitle>Chat with HVAC Assistant</DialogTitle>
-                            </DialogHeader>
-                            <ScrollArea className="h-[400px] pr-4">
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Chat with HVAC Assistant</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <ScrollArea className="h-[400px] pr-4 mb-4">
                                 {messages.map((msg, index) => (
                                     <ChatMessage key={index} message={msg.text} isUser={msg.isUser} />
                                 ))}
                             </ScrollArea>
-                            <div className="flex flex-wrap gap-2 mt-4">
+                            <div className="flex flex-wrap gap-2 mb-4">
                                 {chatOptions.map((option, index) => (
                                     <Button key={index} variant="outline" onClick={() => handleSendMessage(option)}>
                                         {option}
                                     </Button>
                                 ))}
                             </div>
-                            <div className="flex mt-4">
+                            <div className="flex">
                                 <Input
                                     value={inputMessage}
                                     onChange={(e) => setInputMessage(e.target.value)}
@@ -244,8 +250,8 @@ const Dashboard = () => {
                                 />
                                 <Button onClick={() => handleSendMessage()} className="ml-2">Send</Button>
                             </div>
-                        </DialogContent>
-                    </Dialog>
+                        </CardContent>
+                    </Card>
                 </TabsContent>
             </Tabs>
         </div>
